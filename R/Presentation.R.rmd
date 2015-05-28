@@ -12,7 +12,6 @@ fig.caption: yes
 getwd()
 ```
 
-
 So far, we've covered basic directory and file operations in Unix. Things like moving around the file structure (cd); copying, deleting and moving files (cp, rm, mv); showing particular files (ls), and peeking into files (cat, head).  
 
 In git, we discussed version control - this entails being very careful about the files you include, and being able to trace your steps.  
@@ -71,18 +70,30 @@ This follows the standard R format of a function name (in this case **getwd**), 
 When we want to change the working directory to another dedicated directory, we need to use the function **setwd** (similar to cd) and include the new directory path:
 
 ```{r}
-setwd("/media/brad/Data/Documents/softwareCarp/MCBWorkshop2015/R") 
+setwd("/media/brad/Data/Documents/softwareCarp/R") 
 ```
 
-**Exercise 2: Make this work on your computer**
 
-For all you Windows people out there, note the backslashes. 
+**Exercise 2: Make this work on your computer**  
+
+Important! The above path is an example path I'd use on my computer. Use a path specific to your own computer. You can often find this path by right clicking and checking "properties" for a file or folder. You can also sometimes find it in the path bar in your explorer window.
+
+For all you Windows people out there, note the backslashes. If you copy a Windows path, the slashes will be the wrong way around and you'll need to change them (R follows Unix conventions).
 
 Also, note that **strings** in R are defined by quotation marks.   
   
 As in Unix, if we want to navigate up a level in the file hierarchy, we can use the command **setwd("..")**.  Just like in the Unix command line, we can list the files in a directory using the function **list.files**. We can list all the directories in the current directory using **list.dirs**
 
 **Exercise 3: Try moving into different directories using the setwd() function. Make sure you know where you are using getwd(). End up in the ./R directory. List the files in the subdirectory "./data_files".**
+
+```{r}
+setwd("..")
+setwd("./R")
+setwd("./data_files")
+setwd("..")
+list.files("./data_files")  
+```
+
 
 # Reading in data 
 
@@ -92,7 +103,7 @@ To read data from a file  (the results of a gardenia-growing race, involving 3 f
 
 ```
 
-Notice there aren't any functions for .xlsx.
+Notice there aren't any functions for .xlsx. There are specific ways you can read in Excel files, but it's a proprietary format, and can be strange to parse. There are often really bizarre problems with formats, equations, highlights, dates, merged cells, and sheets. Do yourself all kinds of favours, and copy and paste *just* the data you are interested into a single csv sheet. Triple check ahead of time for missing data, or data in strange formats (like dates; or text instead of numbers). This will save many headaches.
 
 Try to read in the data:
 
@@ -129,14 +140,23 @@ A=A*2
 A
 B
 ```
-We can see a few of these variable types using the str(), or structure function. This function is a really important one we'll return to later. You should use it whenever you read in a new dataset.
+We can see a few of these variable types using the str(), or structure function. This function is a really important one we'll return to later. You should use it whenever you read in a new dataset. 
 
 ```{r}
+# Show the details for the data frame 'gardenia'.
 str(gardenia)
 ```
 
+Notice, above, that I **commented** the code. Sticking a pound sign in front of a line of text turns it into a comment, and R will ignore it. This is important when you need to make your code human-readable. Which is always.
 
 **Exercise 4: create a variable, and assign a number to it. Now square the value assigned to that variable using a multiplication operation on the variable**
+
+```{r}
+aaa=7
+aaa=aaa^2
+aaa=aaa*2
+```
+
 
 You can also create variables that contain multiple values. If these are 1 dimensional, we call them **vectors**. We create vectors using the combine function **c**
 
@@ -149,12 +169,28 @@ dummyVector=c(dummyVector, 55)
 print(dummyVector)
 #create, using a range operator
 rangeVector=c(1:6)
+#or, equivalently, for the sticklers
+rangeVector=1:6
+
 print(rangeVector)
 ```
 
 You can perform many of the same operations on vectors that you can on single values
 
 **Exercise 5: add numbers to dummyVector. Subtract. Divide. What happens if you add a dummyVector and rangeVector? If you add a vector containing 2 numbers to dummyVector? or 3? Finally, perform a mathematical operation on dummyVector to turn all values to 1**
+
+```{r}
+#we won't change the contents of dummyVector, since we don't say: dummyVector = dummyVector+1
+dummyVector
+dummyVector+1
+#it adds the second vector, multiple times, across dummyVector 
+dummyVector+c(1, 2)
+#there's an error message, since you can't add the second vector a whole number of times across dummyVector
+dummyVector+c(1, 2, 5)
+dummyVector/3
+dummyVector/dummyVector
+```
+
   
 
 # Accessing data in vectors and dataframes
@@ -172,9 +208,19 @@ dummyVector[3:6]
 ```
 
 **Exercise 6: access the 1st, 3rd, and 5th values in dummyVector (hint, you'll need to use a vector inside the square brackets). Add 10 to only those values. What happens if you change the first variable in dummyVector to "G"?**
+```{r}
+dummyVector
+dummyVector[c(1, 3, 5)]
+dummyVector[c(1, 3, 5)] = dummyVector[c(1, 3, 5)]+10
+dummyVector
+#be really careful about converting among data types in R. It's rarely simple to get back to where you started.
+dummyVector[1]="G"
+dummyVector
+
+```
 
 
-Vectors are flexible, but there are a few restrictions. An important thing to remember about vectors is that all the variables need to be the same type.
+Vectors are flexible, but there are a few restrictions. An important thing to remember about vectors is that all the variables need to be the same type. 
 
 The same operations you can use on vectors work for dataframes. Because data frames are 2D, we need to separate the column values from the row values, and we use a comma for this. Row values come before the comma, column values after. Remember **gardenia**?  
 
@@ -196,10 +242,10 @@ gardenia[c(1:2), (2:3)]
 
 ```
 
-Pay close attention to the way we can access particular subsets of data using vectors. This is a feature we're going to use again and again. Another really handy feature of data frames is indexing by column names, and vectors of column names. We can access a whole column of data by referring to the column by its name.
+Pay close attention to the way we can access particular subsets of data using vectors. This is a feature we're going to use again and again. (to be thorough: there are other ways to access subsets of data, but to keep it simple here, I'll stick with this one style). Another really handy feature of data frames is indexing by column names, and vectors of column names. We can access a whole column of data by referring to the column by its name.
 
 ```{r}
-#notice that the column names are just another vector
+#notice that the column names are just another vector. We'll us this property of data frames to rename columns later.
 colnames(gardenia)
 gardenia[,"leaf_number"]
 gardenia[,c("name", "leaf_number")]
@@ -207,28 +253,70 @@ gardenia[,c("name", "leaf_number")]
 
 **Exercise 7: Some genius from Lockheed Martin measured the height of our friends' gardenias in inches, not centimeters. Given that an inch is 2.54 cm, make a new vector called "h_cm", in which you convert the "height" column to centimeters. Quick! Before the gardenias crash into Mars and all is lost.**
 
+```{r}
+print(gardenia)
+h_cm=gardenia[,"height"]*2.54
+
+```
+
+
 Before the next step, it is a really good time to point out that when you're performing operations on an object, you should first create a backup (say gardenia_bup). Otherwise you have to return to the start every time you screw up. And you *will* screw up.
 
+
 **Exercise 8: add the new height in centimeters column to the gardenia dataframe using column bind, or cbind(). Change the column name for "height" to reflect that one measure of height is in cm, the other in inches using colnames()**
+
+```{r, error=T}
+gardenia=cbind(gardenia, h_cm)
+gardenia
+colnames(gardenia)=c("name", "uni", "h_in", "leaf_number", "flowering_time", "h_cm")
+gardenia
+
+```
 
 A lot of powerful R functions take advantage of the access-by-vector methodology. For instance **order**.
 ```{r}
 gardenia[,"leaf_number"] 
+#this tells us that the lowest value is in the 8th position, the second lowest value is in the 4th position, and so on
 order(gardenia[,"leaf_number"])
 ```
 
 **Exercise 9: Find the order of values in the gardenia "height" column. Use this resulting vector to sort the table. Print the rows containing just the 3 tallest plants**  
 
+```{r}
+gardenia=gardenia[order(gardenia[,"h_cm"]),]
+gardenia[6:8,]
+#if you use the ?order command you might also see the following option
+gardenia=gardenia[order(gardenia[,"h_cm"], decreasing=T),]
+gardenia[1:3,]
+
+```
+
 
 Another function we can use in a similar way, is **which**. which() brings up an important kind of operation, the logical comparison. We use logical operators frequently, to subset data.
 
 ```{r, error=TRUE}
-which(gardenia[,"height"] > 10)
-gardenia[,"height"] < 12
-gardenia[,"name"] == "charles"
+gardenia
+which(gardenia[,"leaf_number"] > 10)
+gardenia[,"leaf_number"] < 10
+#there's a big difference between the == operator (equality) and = (assignment).
+gardenia[,"name"] == "clarice"
 ```
 **Exercise 10: Print the rows containing just the people from USC**  
 
+```{r}
+#we can do this a few ways, including indexing use which(), or via true-false (boolean) indexing
+gardenia[which(gardenia[,"uni"]=="usc"),]
+#it might be easier to understand the above line if we break it up into its components
+whichIndex= which(gardenia[,"uni"]=="usc")
+whichIndex
+gardenia[whichIndex,]
+#and using boolean indexing
+gardenia[c(gardenia[,"uni"]=="usc"),]
+#or, breaking this down into steps:
+boolIndex= gardenia[,"uni"]=="usc"
+boolIndex
+gardenia[boolIndex,]
+```
 
 # Some truthy data.  
 
@@ -244,38 +332,48 @@ The data consists of 4 measurements: cephalocalypsis length, width and area, as 
 ![alt text](figures/snark.jpg)
 
 
-```{r, echo=F, }
+
+
+**Exercise 11: Read in both files of snark data. Stick them together using rbind and call the resulting dataset "snark". Save it as snark.csv, in the data_file folder.**
+
+```{r}
 snark1=read.csv("./raw_data/lewis_snark.csv")
 snark2=read.csv("./raw_data/bellman_snark.csv")
 snark=rbind(snark1, snark2)
 ```
 
-**Exercise 11: Read in both files of snark data. Stick them together using rbind and call the resulting dataset "snark". Save it as snark.csv, in the data_file folder.**
-
-
 Now we quality check. **This is really important!** The first thing we do is make sure all the data is formatted correctly. Try the **str** function on your data. What's going on with sex?
 
 ```{r}
+str(snark)
+
 unique(snark[,"sex"])
 ```
 
 
 Other functions that are useful for checking the properties of your data include length(), nrow(), and dim(); head() and tail().
 
-**Exercise 12: Can you change the sex coding to something sensible using which()? Save the new datafile.**
+As we covered in the workshop, all kinds of weird stuff can happen when you're reading in raw data. We cleaned up the data in the original data files using ctrl-h (find and replace), and eventually got it into a format we could read. We also learned that a couple of options, when you're reading data in for the first time, can be helpful to avoid strange data conversions. Now we'll read in the clean data:
 
-```{r, echo=F, }
-snark[which(snark[,"sex"]=="F"),2]=0
-snark[which(snark[,"sex"]=="f"),2]=0
-snark[which(snark[,"sex"]=="female"),2]=0
-snark[which(snark[,"sex"]=="M"),2]=1
-snark[which(snark[,"sex"]=="m"),2]=1
-snark[which(snark[,"sex"]=="male"),2]=1  
+```{r}
+snark1=read.csv("./raw_data/lewis_snark_clean.csv", as.is=T, strip.white=T)
+snark2=read.csv("./raw_data/bellman_snark_clean.csv", as.is=T, strip.white=T)
+snark=rbind(snark1, snark2)
+#save the good data in a place we're going to use it. I always include the row.names=F option, because otherwise you get an extraneous column of indices every time you save your data.
 write.csv(snark, "./data_files/snark.csv", row.names=F)
 ```
+
+You could also have done it using which statements (this was gong to be exercise 12):
+
 ```{r}
-str(snark)
+unique(snark[,"sex"])
+snark[which(snark[,"sex"]=="f"),2]=0
+snark[which(snark[,"sex"]=="female"),2]=0
+snark[which(snark[,"sex"]=="m"),2]=1
+snark[which(snark[,"sex"]=="male"),2]=1  
+
 ```
+
 
 And now we'll have an actual look at the data using a couple of kinds of plots. These sorts of visualisations are really helpful in picking up gross errors. 
 
@@ -289,15 +387,16 @@ boxplot(snark[,"l_1"]~snark[,"sex"]+snark[,"pop"])
 Notice the boxplot formula format. This is going to come up many times - it's the general R specification for a model. A dependent variable followed by a tilde, and a nominally complicated equation with a bunch of predictors.
 
 **Exercise 13: Let's check for outliers using boxplot, and delete them. We can use logical operators for this.**
-```{r, echo=F}
-#boxplot(snark[,"l_1"]~snark[,"sex"]+snark[,"pop"])
+```{r}
+boxplot(snark[,"l_1"]~snark[,"sex"]+snark[,"pop"])
 snark=snark[which(snark[,"l_1"]<800),]
-#boxplot(snark[,"l_1"]~snark[,"sex"]+snark[,"pop"])
+boxplot(snark[,"l_1"]~snark[,"sex"]+snark[,"pop"])
 
-#boxplot(snark[,"l_7"]~snark[,"sex"]+snark[,"pop"])
+boxplot(snark[,"l_7"]~snark[,"sex"]+snark[,"pop"])
 snark=snark[which(snark[,"l_7"]<800),]
-#boxplot(snark[,"l_7"]~snark[,"sex"]+snark[,"pop"])
+boxplot(snark[,"l_7"]~snark[,"sex"]+snark[,"pop"])
 
+#I hid these two easter eggs, so I knew where to look for them. In reality, it's harder to find, identify and eliminate outliers. There's also a discussion to be had about not deleting outliers, but simply flagging them, and using that flag to exclude them when you run analyses. This makes it much easier for other people to see exactly what you've done, and reproduce your results.
 ```
 
 ...and since we're doing plots anyway, have a play with the famous plot(), and a slightly easier-to-write syntax:
@@ -313,12 +412,17 @@ points(l_10~w_10, data=snark[which(snark[,"sex"]==1),], col="blue")
 **a zombigenic parasitoid beaver.**
 ![alt text](figures/zombigenic_beaver.jpg)
 
+It's critically important to have unique idenitifiers at each level that you might want to analyse the data. For instance here, there should be unique individual, family and population identifiers. If (for instance) numerical family ids are recycled in the different populations, you'll run into a lot of trouble if you look for between-family differences. In this case there *are* unique family ids, but always check.  
+
+
 **Exercise 14: the Snarks need individual id numbers. Create an id column (hint, all you need is the combine function c(), and a range). Add it to the dataset using cbind()**
-```{r, echo=F}
+```{r}
+#nrow returns the number of rows in the data frame
 id=c(1:nrow(snark))
+
+#you could just append the id column as the last column. I reorganised the whole dataframe to make it look tidy.
 snark=cbind(snark[,1:3], id, snark[4:length(snark)])
 ```
-
 
 # Loops
 
@@ -354,11 +458,22 @@ max(snark[,"bod_13"], na.rm=T)
 
 ```
 
+A lot of functions don't by default exclude NA values. It's annoying. Some people will tell you that this is a good thing, in cases where you might not notice that missing, or strange, values have entered your data (like in the case where you accidentally divide by 0). It's still annoying.
+
 **Exercise 15: Use a for-loop, and print max() and mean() summaries for all measurements for all days**
+```{r}
+head(snark)
+for (i in 5:length(snark)){
+  print(max(snark[,i], na.rm=T))  
+  print(mean(snark[,i], na.rm=T))
+}
+```
 
 
 
-Before we go any further, it's critical that we get the data into the right *shape*. By this we mean one row, one observation. Almost any analysis we do (for instance, regression across time) will require this format. While Drs Lewis and Bellman entered the data by individual, we need to reshape the data for such that each day is a row (so-called long format).
+Before we go any further, it's important that we get the data into the right *shape*. By this we mean that there should be one observation per row. Almost any analysis we do (for instance, regression across time) will require this format. It turns out (anecdotally at least) that almost everyone does this wrong at  first. Practically everyone who comes to me with intro stats questions, saying they can't figure out how to do a regression, has their data in the wrong shape, and fixing this one thing fixes their problem.  
+
+While Drs Lewis and Bellman entered the data by individual, we need to reshape the data for such that each day is a row (so-called long format).
 
 To do that, we use a handy function called reshape. We can specify our 
 
@@ -372,9 +487,10 @@ To do that, we use a handy function called reshape. We can specify our
 
 **Exercise 16: reshape the data, call it snarkLong**  
 
-```{r, echo=FALSE}
-
+```{r}
+head(snark)
 snarkLong=reshape(snark, varying=c(5:length(snark)), direction="long", idvar="id", timevar="day", sep="_")
+head(snarkLong)
 
 ```
 Now we can do cool things like:
@@ -401,6 +517,14 @@ abline(cephGrow)
 
 
 **Exercise 17: write linear models to test whether there is variation in growth rate of body and cephalocalypse by sex, population and family**
+```{r}
+bodGrow=lm(bod~day+ sex +pop+family, data=snarkLong)
+summary(bodGrow)
+cephGrow=lm(a~day+ sex +pop+family, data=snarkLong)
+summary(cephGrow)
+
+#everything is super significant, because that's how I made the data. We should always be so lucky.
+```
 
 
 # Doing more than one thing at a time 
@@ -419,6 +543,19 @@ sexSum=ddply(snarkLong, .(sex, day), summarise,
 sexSum
 ```
 **Exercise 18: summarise n, mean, min, max, sd, area, and cephalocalypse:body ratio by sex, population and day**
+
+```{r}
+sexSum=ddply(snarkLong, .(sex, pop, day), summarise, 
+             N= length(bod),
+             aMean=mean(a, na.rm=T),
+             aMax=max(a, na.rm=T),
+             aMin=min(a, na.rm=T),
+             aRat=mean(a, na.rm=T)/mean(bod, na.rm=T))
+
+head(sexSum)
+
+```
+
 
 #The full flexibility of doing particular things to particular stuff requires you to write your own functions...  
 
@@ -452,15 +589,7 @@ print(lucreciaGrowth)
 print(newHeight)
 ```
 
-# Exercise 19: write a function that, for a given sex and family, calculates the mean rate of growth as the ratio between the (average) initial size, and the (average) change in size between the first and last day.
-
-```{r}
-growthRate=function(day1_data, day13_data){
-  #??????
-  #??????
-}
-```
-
+This is about as far as we got, and if you can at least follow most of the code presented (even if you can't reproduce it from memory) then you're well on your way to being able to operate happily in R. And remember, very few people can do even the simplest of these scripts without Google, or the help files. Some of the code examples I gave took me a couple of hours to write (I wasn't familiar with reshape() or plyr() when I started this workshop.) So don't worry if you make mistakes, take time, and maybe need to ask for help.
 
 
 

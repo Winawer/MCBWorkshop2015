@@ -6,7 +6,7 @@ library(reshape)
 getwd()
 
 # Exercise 2: Make this work on your computer**
-setwd("/media/brad/Data/Documents/softwareCarp/MCBWorkshop2015/R")
+setwd("/media/brad/Data/Documents/softwareCarp/R")
 
 # Exercise 3: Try moving into different directories using the setwd() function. List the files in the subdirectory "./datafiles".**
 setwd("..")
